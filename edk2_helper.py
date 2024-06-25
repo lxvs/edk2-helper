@@ -14,7 +14,7 @@ class Edk2Helper:
         self.func()
 
     def _cmd_new(self) -> None:
-        type: str = NEW_TYPES[self.args.type]
+        new_type: str = NEW_TYPES[self.args.type]
         name: str = self.args.name
         location: Path = self.args.location
         parents: bool = self.args.parents
@@ -24,10 +24,10 @@ class Edk2Helper:
             raise Edk2HelperError(
                 f"location ({location.resolve()}) does not exist, either "
                 "specify -p/--parents, or create it manually"
-            )
-        new_file = (new_dir / name).with_suffix('.dec' if type == PACKAGE else '.inf')
+            ) from None
+        new_file = (new_dir / name).with_suffix('.dec' if new_type == PACKAGE else '.inf')
 
-        if type == PACKAGE:
+        if new_type == PACKAGE:
             content = (
                 '[Defines]\n'
                 '  DEC_SPECIFICATION = 0x00010019\n'
@@ -44,16 +44,16 @@ class Edk2Helper:
                 '  MODULE_TYPE       = BASE\n'
                 '  VERSION_STRING    = 1.0\n'
             )
-            if type == MODULE:
+            if new_type == MODULE:
                 content += f'  ENTRY_POINT       = {name}Entry\n'
-            if type == LIBRARY:
+            if new_type == LIBRARY:
                 content += f'  LIBRARY_CLASS     = {name}\n'
 
         try:
             with new_file.open('x', encoding='utf-8', newline='\r\n') as f:
                 f.write(content)
         except FileExistsError:
-            raise Edk2HelperError(f"file already exists: {new_file}")
+            raise Edk2HelperError(f"file already exists: {new_file}") from None
 
 
 class Edk2HelperError(Exception):

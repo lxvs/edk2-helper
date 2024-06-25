@@ -12,6 +12,7 @@ def main() -> int:
     except Edk2HelperError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
+    return 0
 
 if __name__ == '__main__':
     sys.exit(main())
